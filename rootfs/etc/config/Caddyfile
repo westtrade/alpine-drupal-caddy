@@ -1,0 +1,51 @@
+{
+    experimental_http3
+    debug
+    http_port 8282
+    # local_certs
+}
+
+:2015 {
+    root * /etc/application
+
+
+
+
+    # log {
+    #     output stdout
+    #     format logfmt
+    # }
+
+    @forbiden_files {
+        path_regexp \.(engine|inc|install|make|module|profile|po|sh|.*sql|theme|twig|tpl(\.php)?|xtmpl|yml)(~|\.sw[op]|\.bak|\.orig|\.save)?$|^\/?(Entries.*|Repository|Root|Tag|Template|composer\.(json|lock)|web\.config)$|^\/?#.*#$|\.php(~|\.sw[op]|\.bak|\.orig|\.save)$
+        file 
+
+
+        # https://caddy.community/t/is-it-possible-mimic-lookaheads-and-lookbehinds-in-redir-and-regex/5859
+        # https://serverfault.com/questions/795467/for-what-is-the-well-known-folder
+        # path_regexp \.(engine|inc|install|make|module|profile|po|sh|.*sql|theme|twig|tpl(\.php)?|xtmpl|yml)(~|\.sw[op]|\.bak|\.orig|\.save)?$|^(\.(?!well-known).*|Entries.*|Repository|Root|Tag|Template|composer\.(json|lock)|web\.config)$|^#.*#$|\.php(~|\.sw[op]|\.bak|\.orig|\.save)$
+        # Add well-known folder support
+    }
+
+
+    respond @forbiden_files "Access denied" 403 {
+        close
+    }
+
+    php_fastcgi 127.0.0.1:9000 {
+        root /etc/application
+    }
+
+    @only_php {
+        not {
+            file
+        }
+    }
+
+    rewrite @only_php /index.php?{query}&q={path}
+    
+
+
+    file_server browse
+    # # header X-Content-Type-Options nosniff
+}

@@ -82,16 +82,14 @@ RUN curl --show-error --fail --location \
     && /usr/bin/caddy version
 
 RUN adduser developer --disabled-password
-ADD --chown=developer:developer ./containers/server/config/ /etc/config/
+COPY rootfs /
+
 WORKDIR /etc/application
+
+RUN chown developer:developer -R /etc/application
 
 RUN mkdir -p /var/service/log && \
     mkdir -p /var/service/run && \
-    # mkdir -p /var/service/nginx/logs && \
-    # mkdir -p /var/service/temp/body && \
-    # mkdir -p /var/service/temp/proxy && \
-    # mkdir -p /var/service/temp/fastcgi && \
-    # mkdir -p /var/service/temp/uwsgi && \
     chown developer:developer -R /var/service
 
 USER 1000:1000
@@ -102,6 +100,10 @@ RUN composer global require hirak/prestissimo
 RUN composer global require drush/drush
 ENV PATH /home/developer/.composer/vendor/bin:$PATH 
 
+
+RUN curl -sSL https://www.drupal.org/download-latest/tar.gz | tar -xz --strip-components=1
+
 EXPOSE 9000 2015 9035
+
 
 # ENTRYPOINT 'bash -c "supervisord -c /etc/config/supervisor.conf'

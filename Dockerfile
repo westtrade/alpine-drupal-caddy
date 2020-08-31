@@ -50,6 +50,7 @@ RUN apk upgrade -U -v  --progress && \
     php7-intl \
     php7-openssl \
     php7-pear \
+    php7-xmlwriter \
     php7-imagick \
     # php7-posix \
     php7-calendar \
@@ -57,7 +58,8 @@ RUN apk upgrade -U -v  --progress && \
     git \
     gzip \
     ca-certificates \
-    mysql-client \
+    # -Remove
+    mysql-client \ 
     openssh \
     libcap \
     imagemagick \
@@ -100,8 +102,13 @@ RUN composer global require hirak/prestissimo
 RUN composer global require drush/drush
 ENV PATH /home/developer/.composer/vendor/bin:$PATH 
 
+# ARG drupal_version=9.0.0
+ARG drupal_version=8.x
 
-RUN curl -sSL https://www.drupal.org/download-latest/tar.gz | tar -xz --strip-components=1
+# 8.x-dev
+# RUN composer create-project "drupal/drupal:${drupal_version}" /etc/application --stability dev --no-interaction
+RUN composer create-project "drupal/drupal:${drupal_version}" /etc/application --no-interaction
+RUN composer require webonyx/graphql-php drupal/graphql
 
 EXPOSE 9000 2015 9035
 

@@ -108,9 +108,23 @@ ARG drupal_version=8.x
 # 8.x-dev
 # RUN composer create-project "drupal/drupal:${drupal_version}" /etc/application --stability dev --no-interaction
 RUN composer create-project "drupal/drupal:${drupal_version}" /etc/application --no-interaction
-RUN composer require webonyx/graphql-php drupal/graphql
+RUN composer require \
+    webonyx/graphql-php \
+    drupal/graphql \
+    drupal/deploy \
+    drupal/features \ 
+    drupal/admin_toolbar \
+    drupal/inline_entity_form \
+    drupal/entity_browser \
+    drupal/devel \
+    drupal/pathauto \
+    drupal/redis \
+    drupal/auto_entitylabel 
+
 
 EXPOSE 9000 2015 9035
 
 
-# ENTRYPOINT 'bash -c "supervisord -c /etc/config/supervisor.conf'
+# ENTRYPOINT '/bin/sh -c "/usr/bin/supervisord -c /etc/config/supervisor.conf"'
+
+CMD ["sh", "-c", "/usr/bin/supervisord -c /etc/config/supervisor.conf"]
